@@ -1,0 +1,12 @@
+- name: python3 インストール
+  yum:
+    name: python3
+    state: present
+
+
+- name: supervisor インストール
+  pip:
+    name: supervisor
+    state: present
+  vars:
+    ansible_python_interpreter: /usr/bin/python3

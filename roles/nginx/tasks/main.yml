@@ -1,0 +1,32 @@
+- name: nginxの起動ユーザーの追加
+  user:
+    name: nginx
+
+
+- name: install Nginx official repository
+  yum_repository:
+    name: nginx
+    description: Extra Packages for Enterprise Linux 7 - $basearch
+    baseurl: http://nginx.org/packages/centos/7/$basearch/
+    enabled: no
+
+
+- name: Add gpg key
+  rpm_key: 
+    key: http://nginx.org/keys/nginx_signing.key
+
+
+- name: nginxのインストール
+  yum:
+    name: nginx
+    enablerepo: nginx
+    state: latest
+  notify:
+    - restart nginx
+
+
+- name: nginx 起動＆初期起動ON
+  service:
+    name: nginx
+    state: started
+    enabled: yes

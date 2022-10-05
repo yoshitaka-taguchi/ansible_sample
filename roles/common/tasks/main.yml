@@ -1,0 +1,56 @@
+- name: SELinux 無効化
+  selinux:
+    policy: targeted
+    state: disabled
+
+
+- name: システムロケールの確認
+  command: localectl status
+  register: localectl_result
+  check_mode: no
+  changed_when: false
+
+- name: ロケールの変更
+  command: localectl set-locale LANG=ja_JP.utf8
+  when: "'LANG=ja_JP.utf8' not in localectl_result.stdout"
+
+
+- name: タイムゾーンを日本にする
+  timezone:
+    name: Asia/Tokyo
+
+
+- name: install epel-release
+  yum:
+    name: epel-release
+    state: present
+
+
+- name: install remi
+  yum:
+    name: http://ftp.riken.jp/Linux/remi/enterprise/remi-release-7.rpm
+    state: present
+
+
+- name: yum update
+  yum: name=* state=latest
+
+
+- name: modify sshd_config
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    state: present
+    backrefs: yes
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+    - regexp: '^#?PermitRootLogin.*'
+      line: 'PermitRootLogin no'
+    - regexp: '^#?PasswordAuthentication yes'
+      line: 'PasswordAuthentication no'
+    - regexp: '^#?ChallengeResponseAuthentication'
+      line: 'ChallengeResponseAuthentication no'
+    - regexp: '^#?PubkeyAuthentication'
+      line: 'PubkeyAuthentication yes'
+  notify:
+    - restart sshd

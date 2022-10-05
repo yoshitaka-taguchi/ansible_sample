@@ -1,0 +1,11 @@
+- name: php インストール
+  yum:
+    name: "{{ item.filename }}"
+    enablerepo: remi-php81
+  with_items:
+    - filename: php
+    - filename: php-fpm
+    - filename: php-mbstring
+    - filename: php-xml
+    - filename: php-pdo
+    - filename: php-mysqlnd

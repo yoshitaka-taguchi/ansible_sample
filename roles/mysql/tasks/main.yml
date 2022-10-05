@@ -1,0 +1,54 @@
+- name: mariadb アンインストール
+  yum:
+    name: mariadb-libs
+    state: absent
+
+
+- name: MariaDB データディレクトリ削除
+  file:
+    path: /var/lib/mysql
+    state: absent
+
+
+- name: yum clean
+  command: yum clean all
+  args:
+    warn: no
+
+
+- name: mysql repository インストール
+  yum:
+    name: https://repo.mysql.com/mysql80-community-release-el7-7.noarch.rpm
+    state: present
+
+
+- name: yum-utils
+  yum:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - yum-utils
+
+
+- name: mysql-python
+  yum:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - MySQL-python
+
+
+- name: mysql-community-server インストール
+  yum:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - mysql-community-server
+  notify:
+    - restart mysql
+
+- name: MYSQL 起動＆初期起動ON
+  service:
+    name: mysqld
+    state: started
+    enabled: yes

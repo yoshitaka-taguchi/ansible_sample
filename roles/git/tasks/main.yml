@@ -1,0 +1,40 @@
+- name: Install a list of packages
+  yum:
+    name:
+      - autoconf
+      - gcc
+      - curl-devel
+      - expat-devel
+      - gettext-devel
+      - openssl-devel
+      - perl-ExtUtils-MakeMaker
+      - wget
+      - zlib-devel
+    state: latest
+
+- name: Remove old git
+  yum:
+    name: git
+    state: absent
+
+- name: Unarchive a file that needs to be downloaded
+  unarchive:
+    src: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.24.4.tar.gz
+    dest: /usr/local/src
+    remote_src: yes
+
+- name: Build 'all' target
+  make:
+    chdir: /usr/local/src/git-2.24.4
+    target: all
+
+- name: Run 'install' target
+  make:
+    chdir: /usr/local/src/git-2.24.4
+    target: install
+
+- name: Create a symbolic link
+  file:
+    src: /usr/local/src/git-2.24.4/git
+    dest: /bin/git
+    state: link
